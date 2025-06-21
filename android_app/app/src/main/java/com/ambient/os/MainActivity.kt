@@ -1,15 +1,19 @@
 package com.ambient.os
 
+import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.ambient.os.databinding.ActivityMainBinding
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -50,6 +54,16 @@ class MainActivity : AppCompatActivity() {
             toggleClipboardSync(isChecked)
         }
     }
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+            if (isGranted) {
+                startClipboardSync()
+            } else {
+                Toast.makeText(this, "Notification permission is required for clipboard sync.", Toast.LENGTH_LONG).show()
+                binding.syncSwitch.isChecked = false
+            }
+        }
 
     private fun saveIpAddress() {
         val ipAddress = binding.ipAddressInput.text.toString()
@@ -176,21 +190,42 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun toggleClipboardSync(enable: Boolean) {
+        if (enable) {
+            if (binding.ipAddressInput.text.isBlank()) {
+                Toast.makeText(this, "Please enter IP address first", Toast.LENGTH_SHORT).show()
+                binding.syncSwitch.isChecked = false
+                return
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                when (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)) {
+                    PackageManager.PERMISSION_GRANTED -> startClipboardSync()
+                    else -> requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            } else {
+                startClipboardSync()
+            }
+        } else {
+            stopClipboardSync()
+        }
+    }
+
+    private fun startClipboardSync() {
         val intent = Intent(this, ClipboardSyncService::class.java).also {
             it.putExtra("IP_ADDRESS", binding.ipAddressInput.text.toString())
         }
-        if (enable) {
-            if (binding.ipAddressInput.text.isNotBlank()) {
-                startService(intent)
-                Toast.makeText(this, "Clipboard sync started", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Please enter IP address first", Toast.LENGTH_SHORT).show()
-                binding.syncSwitch.isChecked = false
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent)
         } else {
-            stopService(intent)
-            Toast.makeText(this, "Clipboard sync stopped", Toast.LENGTH_SHORT).show()
+            startService(intent)
         }
+        Toast.makeText(this, "Clipboard sync started", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun stopClipboardSync() {
+        val intent = Intent(this, ClipboardSyncService::class.java)
+        stopService(intent)
+        Toast.makeText(this, "Clipboard sync stopped", Toast.LENGTH_SHORT).show()
     }
 
     override fun onResume() {
