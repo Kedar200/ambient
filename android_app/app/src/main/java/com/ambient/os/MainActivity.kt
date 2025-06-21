@@ -1,6 +1,7 @@
 package com.ambient.os
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -16,16 +17,26 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var selectedImageUri: Uri? = null
+    private val preferences by lazy {
+        getSharedPreferences("ambient_os_prefs", Context.MODE_PRIVATE)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        loadIpAddress()
+
+        binding.saveIpButton.setOnClickListener {
+            saveIpAddress()
+        }
 
         binding.selectImageButton.setOnClickListener {
             openImageChooser()
@@ -34,6 +45,21 @@ class MainActivity : AppCompatActivity() {
         binding.uploadButton.setOnClickListener {
             uploadImage()
         }
+    }
+
+    private fun saveIpAddress() {
+        val ipAddress = binding.ipAddressInput.text.toString()
+        if (ipAddress.isNotBlank()) {
+            preferences.edit().putString("agent_ip_address", ipAddress).apply()
+            Toast.makeText(this, "IP Address Saved", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "IP Address cannot be empty", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun loadIpAddress() {
+        val savedIp = preferences.getString("agent_ip_address", "")
+        binding.ipAddressInput.setText(savedIp)
     }
 
     private val selectImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -64,18 +90,28 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        binding.uploadButton.isEnabled = false
+
         val file = getFileFromUri(selectedImageUri!!)
         if (file == null) {
             Toast.makeText(this, "Failed to access file", Toast.LENGTH_SHORT).show()
+            binding.uploadButton.isEnabled = true
             return
         }
 
         val url = "http://$ipAddress:3000/upload"
-        val client = OkHttpClient()
+        val client = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .build()
+
+        val mediaType = contentResolver.getType(selectedImageUri!!)?.toMediaTypeOrNull()
+            ?: "application/octet-stream".toMediaTypeOrNull()
 
         val requestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
-            .addFormDataPart("file", file.name, file.asRequestBody("image/jpeg".toMediaTypeOrNull()))
+            .addFormDataPart("file", file.name, file.asRequestBody(mediaType))
             .build()
 
         val request = Request.Builder()
@@ -88,6 +124,7 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
                     Toast.makeText(this@MainActivity, "Upload failed: ${e.message}", Toast.LENGTH_LONG).show()
                     Log.e("Upload", "Failed", e)
+                    binding.uploadButton.isEnabled = true
                 }
             }
 
@@ -98,6 +135,7 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         Toast.makeText(this@MainActivity, "Upload failed: ${response.message}", Toast.LENGTH_LONG).show()
                     }
+                    binding.uploadButton.isEnabled = true
                 }
             }
         })
