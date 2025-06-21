@@ -1,0 +1,13 @@
+*.apk
+*.aab
+*.ap_
+*.apks
+*.dex
+*.class
+*.swp
+*~
+.gradle/
+/build/
+/captures/
+.DS_Store
+local.properties 

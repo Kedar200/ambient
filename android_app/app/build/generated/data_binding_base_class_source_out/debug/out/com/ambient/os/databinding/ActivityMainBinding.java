@@ -28,17 +28,21 @@ public final class ActivityMainBinding implements ViewBinding {
   public final ImageView previewImageView;
 
   @NonNull
+  public final Button saveIpButton;
+
+  @NonNull
   public final Button selectImageButton;
 
   @NonNull
   public final Button uploadButton;
 
   private ActivityMainBinding(@NonNull ConstraintLayout rootView, @NonNull EditText ipAddressInput,
-      @NonNull ImageView previewImageView, @NonNull Button selectImageButton,
-      @NonNull Button uploadButton) {
+      @NonNull ImageView previewImageView, @NonNull Button saveIpButton,
+      @NonNull Button selectImageButton, @NonNull Button uploadButton) {
     this.rootView = rootView;
     this.ipAddressInput = ipAddressInput;
     this.previewImageView = previewImageView;
+    this.saveIpButton = saveIpButton;
     this.selectImageButton = selectImageButton;
     this.uploadButton = uploadButton;
   }
@@ -82,6 +86,12 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.saveIpButton;
+      Button saveIpButton = ViewBindings.findChildViewById(rootView, id);
+      if (saveIpButton == null) {
+        break missingId;
+      }
+
       id = R.id.selectImageButton;
       Button selectImageButton = ViewBindings.findChildViewById(rootView, id);
       if (selectImageButton == null) {
@@ -95,7 +105,7 @@ public final class ActivityMainBinding implements ViewBinding {
       }
 
       return new ActivityMainBinding((ConstraintLayout) rootView, ipAddressInput, previewImageView,
-          selectImageButton, uploadButton);
+          saveIpButton, selectImageButton, uploadButton);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

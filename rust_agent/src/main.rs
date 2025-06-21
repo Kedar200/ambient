@@ -1,5 +1,5 @@
 use axum::{
-    extract::Multipart,
+    extract::{DefaultBodyLimit, Multipart},
     http::StatusCode,
     response::{Html, IntoResponse},
     routing::{get, post},
@@ -24,7 +24,8 @@ async fn main() {
 
     let app = Router::new()
         .route("/", get(root))
-        .route("/upload", post(upload));
+        .route("/upload", post(upload))
+        .layer(DefaultBodyLimit::max(50 * 1024 * 1024));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     info!("listening on {}", addr);

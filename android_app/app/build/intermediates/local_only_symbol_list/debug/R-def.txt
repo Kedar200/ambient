@@ -9,6 +9,7 @@ color teal_700
 color white
 id ipAddressInput
 id previewImageView
+id saveIpButton
 id selectImageButton
 id uploadButton
 layout activity_main
