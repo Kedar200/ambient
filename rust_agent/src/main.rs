@@ -1,16 +1,28 @@
 use axum::{
-    extract::{DefaultBodyLimit, Multipart},
+    extract::{DefaultBodyLimit, Multipart, State},
     http::StatusCode,
-    response::{Html, IntoResponse},
+    response::{Html, IntoResponse, Json},
     routing::{get, post},
     Router,
 };
+use serde::{Deserialize, Serialize};
 use std::io;
 use std::net::SocketAddr;
-use tokio::{fs::File, io::AsyncWriteExt};
+use std::sync::Arc;
+use tokio::{fs::File, io::AsyncWriteExt, sync::Mutex};
 use tracing::{info, instrument};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use open;
+use arboard::Clipboard;
+
+#[derive(Serialize, Deserialize)]
+struct ClipboardPayload {
+    content: String,
+}
+
+struct AppState {
+    clipboard: Mutex<Clipboard>,
+}
 
 #[tokio::main]
 async fn main() {
@@ -22,10 +34,16 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
+    let state = Arc::new(AppState {
+        clipboard: Mutex::new(Clipboard::new().expect("Failed to initialize clipboard")),
+    });
+
     let app = Router::new()
         .route("/", get(root))
         .route("/upload", post(upload))
-        .layer(DefaultBodyLimit::max(50 * 1024 * 1024));
+        .route("/clipboard", get(get_clipboard).post(set_clipboard))
+        .layer(DefaultBodyLimit::max(50 * 1024 * 1024))
+        .with_state(state);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     info!("listening on {}", addr);
@@ -68,6 +86,27 @@ async fn upload(mut multipart: Multipart) -> Result<Html<String>, AppError> {
     Ok(Html("No file uploaded.".to_string()))
 }
 
+#[instrument(skip(state))]
+async fn get_clipboard(
+    State(state): State<Arc<AppState>>,
+) -> Result<Json<ClipboardPayload>, AppError> {
+    let mut clipboard = state.clipboard.lock().await;
+    let content = clipboard.get_text()?;
+    info!("Read clipboard content of length {}", content.len());
+    Ok(Json(ClipboardPayload { content }))
+}
+
+#[instrument(skip(state, payload))]
+async fn set_clipboard(
+    State(state): State<Arc<AppState>>,
+    Json(payload): Json<ClipboardPayload>,
+) -> Result<StatusCode, AppError> {
+    let mut clipboard = state.clipboard.lock().await;
+    clipboard.set_text(payload.content.clone())?;
+    info!(content_length = payload.content.len(), "Set clipboard content");
+    Ok(StatusCode::OK)
+}
+
 struct AppError(StatusCode, String);
 
 impl IntoResponse for AppError {
@@ -87,6 +126,15 @@ impl From<io::Error> for AppError {
         AppError(
             StatusCode::INTERNAL_SERVER_ERROR,
             format!("File system error: {}", err),
+        )
+    }
+}
+
+impl From<arboard::Error> for AppError {
+    fn from(err: arboard::Error) -> Self {
+        AppError(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Clipboard error: {}", err),
         )
     }
 }

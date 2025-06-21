@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
@@ -34,16 +35,21 @@ public final class ActivityMainBinding implements ViewBinding {
   public final Button selectImageButton;
 
   @NonNull
+  public final SwitchCompat syncSwitch;
+
+  @NonNull
   public final Button uploadButton;
 
   private ActivityMainBinding(@NonNull ConstraintLayout rootView, @NonNull EditText ipAddressInput,
       @NonNull ImageView previewImageView, @NonNull Button saveIpButton,
-      @NonNull Button selectImageButton, @NonNull Button uploadButton) {
+      @NonNull Button selectImageButton, @NonNull SwitchCompat syncSwitch,
+      @NonNull Button uploadButton) {
     this.rootView = rootView;
     this.ipAddressInput = ipAddressInput;
     this.previewImageView = previewImageView;
     this.saveIpButton = saveIpButton;
     this.selectImageButton = selectImageButton;
+    this.syncSwitch = syncSwitch;
     this.uploadButton = uploadButton;
   }
 
@@ -98,6 +104,12 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.syncSwitch;
+      SwitchCompat syncSwitch = ViewBindings.findChildViewById(rootView, id);
+      if (syncSwitch == null) {
+        break missingId;
+      }
+
       id = R.id.uploadButton;
       Button uploadButton = ViewBindings.findChildViewById(rootView, id);
       if (uploadButton == null) {
@@ -105,7 +117,7 @@ public final class ActivityMainBinding implements ViewBinding {
       }
 
       return new ActivityMainBinding((ConstraintLayout) rootView, ipAddressInput, previewImageView,
-          saveIpButton, selectImageButton, uploadButton);
+          saveIpButton, selectImageButton, syncSwitch, uploadButton);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

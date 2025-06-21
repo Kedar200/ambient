@@ -45,6 +45,10 @@ class MainActivity : AppCompatActivity() {
         binding.uploadButton.setOnClickListener {
             uploadImage()
         }
+
+        binding.syncSwitch.setOnCheckedChangeListener { _, isChecked ->
+            toggleClipboardSync(isChecked)
+        }
     }
 
     private fun saveIpAddress() {
@@ -159,5 +163,38 @@ class MainActivity : AppCompatActivity() {
             return null
         }
         return file
+    }
+
+    private fun isServiceRunning(serviceClass: Class<*>): Boolean {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
+        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun toggleClipboardSync(enable: Boolean) {
+        val intent = Intent(this, ClipboardSyncService::class.java).also {
+            it.putExtra("IP_ADDRESS", binding.ipAddressInput.text.toString())
+        }
+        if (enable) {
+            if (binding.ipAddressInput.text.isNotBlank()) {
+                startService(intent)
+                Toast.makeText(this, "Clipboard sync started", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Please enter IP address first", Toast.LENGTH_SHORT).show()
+                binding.syncSwitch.isChecked = false
+            }
+        } else {
+            stopService(intent)
+            Toast.makeText(this, "Clipboard sync stopped", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.syncSwitch.isChecked = isServiceRunning(ClipboardSyncService::class.java)
     }
 } 

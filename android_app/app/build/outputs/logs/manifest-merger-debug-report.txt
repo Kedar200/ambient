@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-31:12
-INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-31:12
-INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-31:12
-INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-31:12
+ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-38:12
+INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-38:12
+INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-38:12
+INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-38:12
 MERGED from [androidx.databinding:viewbinding:8.2.0] /Users/kedar/.gradle/caches/8.10/transforms/c31abeb2b8f948781f0aec7431ca8364/transformed/jetified-viewbinding-8.2.0/AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.material:material:1.11.0] /Users/kedar/.gradle/caches/8.10/transforms/ae9473ebd027d27c2331bdf4830699ce/transformed/material-1.11.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/kedar/.gradle/caches/8.10/transforms/a7e9c9d1b5872d1f258cf99a0a6035b0/transformed/constraintlayout-2.1.4/AndroidManifest.xml:2:1-11:12
@@ -68,9 +68,13 @@ uses-permission#android.permission.ACCESS_NETWORK_STATE
 ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:7:5-79
 	android:name
 		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:7:22-76
+uses-permission#android.permission.FOREGROUND_SERVICE
+ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:8:5-76
+	android:name
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:8:22-74
 application
-ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:9:5-29:19
-INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:9:5-29:19
+ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:10:5-36:19
+INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:10:5-36:19
 MERGED from [com.google.android.material:material:1.11.0] /Users/kedar/.gradle/caches/8.10/transforms/ae9473ebd027d27c2331bdf4830699ce/transformed/material-1.11.0/AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.11.0] /Users/kedar/.gradle/caches/8.10/transforms/ae9473ebd027d27c2331bdf4830699ce/transformed/material-1.11.0/AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/kedar/.gradle/caches/8.10/transforms/a7e9c9d1b5872d1f258cf99a0a6035b0/transformed/constraintlayout-2.1.4/AndroidManifest.xml:9:5-20
@@ -92,41 +96,49 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] /Users/kedar/.gradle/caches
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.12.0] /Users/kedar/.gradle/caches/8.10/transforms/2667c3af19223064515883316ecf0918/transformed/core-1.12.0/AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:16:9-35
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:17:9-35
 	android:label
-		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:14:9-41
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:15:9-41
 	android:fullBackupContent
-		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:12:9-54
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:13:9-54
 	android:roundIcon
-		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:15:9-63
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:16:9-63
 	tools:targetApi
-		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:19:9-29
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:20:9-29
 	android:icon
-		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:13:9-58
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:14:9-58
 	android:allowBackup
-		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:10:9-35
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:11:9-35
 	android:theme
-		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:17:9-47
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:18:9-47
 	android:dataExtractionRules
-		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:11:9-65
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:12:9-65
 	android:usesCleartextTraffic
-		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:18:9-44
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:19:9-44
 activity#com.ambient.os.MainActivity
-ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:20:9-28:20
+ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:21:9-29:20
 	android:exported
-		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:22:13-36
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:23:13-36
 	android:name
-		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:21:13-41
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:22:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:23:13-27:29
+ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:24:13-28:29
 action#android.intent.action.MAIN
-ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:24:17-69
+ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:25:17-69
 	android:name
-		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:24:25-66
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:25:25-66
 category#android.intent.category.LAUNCHER
-ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:26:17-77
+ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:27:17-77
 	android:name
-		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:26:27-74
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:27:27-74
+service#com.ambient.os.ClipboardSyncService
+ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:31:9-34:40
+	android:enabled
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:33:13-35
+	android:exported
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:34:13-37
+	android:name
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:32:13-49
 uses-sdk
 INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml

@@ -11,6 +11,7 @@ id ipAddressInput
 id previewImageView
 id saveIpButton
 id selectImageButton
+id syncSwitch
 id uploadButton
 layout activity_main
 string app_name
