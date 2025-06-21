@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-39:12
-INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-39:12
-INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-39:12
-INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-39:12
+ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-40:12
+INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-40:12
+INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-40:12
+INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:2:1-40:12
 MERGED from [androidx.databinding:viewbinding:8.2.0] /Users/kedar/.gradle/caches/8.10/transforms/c31abeb2b8f948781f0aec7431ca8364/transformed/jetified-viewbinding-8.2.0/AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.android.material:material:1.11.0] /Users/kedar/.gradle/caches/8.10/transforms/ae9473ebd027d27c2331bdf4830699ce/transformed/material-1.11.0/AndroidManifest.xml:17:1-24:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/kedar/.gradle/caches/8.10/transforms/a7e9c9d1b5872d1f258cf99a0a6035b0/transformed/constraintlayout-2.1.4/AndroidManifest.xml:2:1-11:12
@@ -77,8 +77,8 @@ ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifes
 	android:name
 		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:9:22-74
 application
-ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:11:5-37:19
-INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:11:5-37:19
+ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:11:5-38:19
+INJECTED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:11:5-38:19
 MERGED from [com.google.android.material:material:1.11.0] /Users/kedar/.gradle/caches/8.10/transforms/ae9473ebd027d27c2331bdf4830699ce/transformed/material-1.11.0/AndroidManifest.xml:22:5-20
 MERGED from [com.google.android.material:material:1.11.0] /Users/kedar/.gradle/caches/8.10/transforms/ae9473ebd027d27c2331bdf4830699ce/transformed/material-1.11.0/AndroidManifest.xml:22:5-20
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] /Users/kedar/.gradle/caches/8.10/transforms/a7e9c9d1b5872d1f258cf99a0a6035b0/transformed/constraintlayout-2.1.4/AndroidManifest.xml:9:5-20
@@ -136,11 +136,13 @@ ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifes
 	android:name
 		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:28:27-74
 service#com.ambient.os.ClipboardSyncService
-ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:32:9-35:40
+ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:32:9-36:56
 	android:enabled
 		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:34:13-35
 	android:exported
 		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:35:13-37
+	android:foregroundServiceType
+		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:36:13-53
 	android:name
 		ADDED from /Users/kedar/personal/ambient/android_app/app/src/main/AndroidManifest.xml:33:13-49
 uses-sdk

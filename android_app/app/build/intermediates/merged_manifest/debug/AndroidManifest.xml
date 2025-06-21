@@ -47,7 +47,8 @@
         <service
             android:name="com.ambient.os.ClipboardSyncService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
         <provider
             android:name="androidx.startup.InitializationProvider"
