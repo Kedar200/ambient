@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- TODO: Remove this file if not needed. -->
+    </cloud-backup>
+    <device-transfer>
+        <!-- TODO: Remove this file if not needed. -->
+    </device-transfer>
+</data-extraction-rules> 
