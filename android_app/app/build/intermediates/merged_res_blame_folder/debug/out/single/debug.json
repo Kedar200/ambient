@@ -1,15 +1,63 @@
 [
     {
-        "merged": "com.ambient.os.app-merged_res-31:/layout_activity_main.xml.flat",
-        "source": "com.ambient.os.app-main-33:/layout/activity_main.xml"
+        "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/drawable_ic_settings.xml.flat",
+        "source": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-main-33:/drawable/ic_settings.xml"
+    },
+    {
+        "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/drawable_edit_text_background.xml.flat",
+        "source": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-main-33:/drawable/edit_text_background.xml"
+    },
+    {
+        "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/drawable_ic_share.xml.flat",
+        "source": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-main-33:/drawable/ic_share.xml"
+    },
+    {
+        "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/drawable_ic_image.xml.flat",
+        "source": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-main-33:/drawable/ic_image.xml"
+    },
+    {
+        "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/drawable_button_background.xml.flat",
+        "source": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-main-33:/drawable/button_background.xml"
     },
     {
         "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/layout_activity_main.xml.flat",
         "source": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-main-33:/layout/activity_main.xml"
     },
     {
+        "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/drawable_ic_ambient_logo.xml.flat",
+        "source": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-main-33:/drawable/ic_ambient_logo.xml"
+    },
+    {
         "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/xml_data_extraction_rules.xml.flat",
         "source": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-main-33:/xml/data_extraction_rules.xml"
+    },
+    {
+        "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/xml_accessibility_service_config.xml.flat",
+        "source": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-main-33:/xml/accessibility_service_config.xml"
+    },
+    {
+        "merged": "com.ambient.os.app-merged_res-31:/layout_activity_main.xml.flat",
+        "source": "com.ambient.os.app-main-33:/layout/activity_main.xml"
+    },
+    {
+        "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/drawable_toast_success_background.xml.flat",
+        "source": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-main-33:/drawable/toast_success_background.xml"
+    },
+    {
+        "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/drawable_ic_clipboard.xml.flat",
+        "source": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-main-33:/drawable/ic_clipboard.xml"
+    },
+    {
+        "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/layout_custom_toast.xml.flat",
+        "source": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-main-33:/layout/custom_toast.xml"
+    },
+    {
+        "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/drawable_card_background.xml.flat",
+        "source": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-main-33:/drawable/card_background.xml"
+    },
+    {
+        "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/drawable_toast_error_background.xml.flat",
+        "source": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-main-33:/drawable/toast_error_background.xml"
     },
     {
         "merged": "/Users/kedar/.gradle/daemon/8.10/com.ambient.os.app-merged_res-31:/xml_backup_rules.xml.flat",

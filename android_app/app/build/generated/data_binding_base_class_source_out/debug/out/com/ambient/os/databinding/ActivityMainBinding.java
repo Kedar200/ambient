@@ -5,25 +5,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.ambient.os.R;
+import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.textfield.TextInputEditText;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
 
 public final class ActivityMainBinding implements ViewBinding {
   @NonNull
-  private final ConstraintLayout rootView;
+  private final CoordinatorLayout rootView;
 
   @NonNull
-  public final EditText ipAddressInput;
+  public final TextInputEditText ipAddressInput;
 
   @NonNull
   public final ImageView previewImageView;
@@ -35,27 +36,31 @@ public final class ActivityMainBinding implements ViewBinding {
   public final Button selectImageButton;
 
   @NonNull
-  public final SwitchCompat syncSwitch;
+  public final SwitchMaterial syncSwitch;
+
+  @NonNull
+  public final Toolbar toolbar;
 
   @NonNull
   public final Button uploadButton;
 
-  private ActivityMainBinding(@NonNull ConstraintLayout rootView, @NonNull EditText ipAddressInput,
-      @NonNull ImageView previewImageView, @NonNull Button saveIpButton,
-      @NonNull Button selectImageButton, @NonNull SwitchCompat syncSwitch,
-      @NonNull Button uploadButton) {
+  private ActivityMainBinding(@NonNull CoordinatorLayout rootView,
+      @NonNull TextInputEditText ipAddressInput, @NonNull ImageView previewImageView,
+      @NonNull Button saveIpButton, @NonNull Button selectImageButton,
+      @NonNull SwitchMaterial syncSwitch, @NonNull Toolbar toolbar, @NonNull Button uploadButton) {
     this.rootView = rootView;
     this.ipAddressInput = ipAddressInput;
     this.previewImageView = previewImageView;
     this.saveIpButton = saveIpButton;
     this.selectImageButton = selectImageButton;
     this.syncSwitch = syncSwitch;
+    this.toolbar = toolbar;
     this.uploadButton = uploadButton;
   }
 
   @Override
   @NonNull
-  public ConstraintLayout getRoot() {
+  public CoordinatorLayout getRoot() {
     return rootView;
   }
 
@@ -81,7 +86,7 @@ public final class ActivityMainBinding implements ViewBinding {
     int id;
     missingId: {
       id = R.id.ipAddressInput;
-      EditText ipAddressInput = ViewBindings.findChildViewById(rootView, id);
+      TextInputEditText ipAddressInput = ViewBindings.findChildViewById(rootView, id);
       if (ipAddressInput == null) {
         break missingId;
       }
@@ -105,8 +110,14 @@ public final class ActivityMainBinding implements ViewBinding {
       }
 
       id = R.id.syncSwitch;
-      SwitchCompat syncSwitch = ViewBindings.findChildViewById(rootView, id);
+      SwitchMaterial syncSwitch = ViewBindings.findChildViewById(rootView, id);
       if (syncSwitch == null) {
+        break missingId;
+      }
+
+      id = R.id.toolbar;
+      Toolbar toolbar = ViewBindings.findChildViewById(rootView, id);
+      if (toolbar == null) {
         break missingId;
       }
 
@@ -116,8 +127,8 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityMainBinding((ConstraintLayout) rootView, ipAddressInput, previewImageView,
-          saveIpButton, selectImageButton, syncSwitch, uploadButton);
+      return new ActivityMainBinding((CoordinatorLayout) rootView, ipAddressInput, previewImageView,
+          saveIpButton, selectImageButton, syncSwitch, toolbar, uploadButton);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

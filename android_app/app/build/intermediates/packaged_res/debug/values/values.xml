@@ -1,24 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:ns1="http://schemas.android.com/tools">
+<resources>
+    <color name="accent">#F97316</color>
+    <color name="background">#F0F9FF</color>
     <color name="black">#FF000000</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="divider">#E0F2FE</color>
+    <color name="error">#EF4444</color>
+    <color name="primary">#0D9488</color>
+    <color name="primary_dark">#0F766E</color>
+    <color name="primary_light">#5EEAD4</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
+    <color name="success">#22C55E</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
+    <color name="text_primary">#0C4A6E</color>
+    <color name="text_secondary">#38BDF8</color>
     <color name="white">#FFFFFFFF</color>
     <string name="app_name">Ambient OS</string>
-    <style name="Theme.AmbientOS" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.AmbientOS" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         
-        <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
         <item name="colorOnPrimary">@color/white</item>
         
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_700</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondary">@color/accent</item>
+        <item name="colorSecondaryVariant">@color/accent</item>
+        <item name="colorOnSecondary">@color/white</item>
         
-        <item name="android:statusBarColor" ns1:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
         
+        <item name="android:windowBackground">@color/background</item>
+        
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        
+        <item name="materialButtonStyle">@style/Widget.AmbientOS.Button</item>
+        <item name="switchStyle">@style/Widget.AmbientOS.Switch</item>
+        <item name="editTextStyle">@style/Widget.AmbientOS.EditText</item>
+    </style>
+    <style name="ThemeOverlay.AmbientOS.Switch" parent="">
+        <item name="colorSecondary">@color/primary</item>
+        <item name="colorSurface">@color/text_secondary</item>
+    </style>
+    <style name="TransparentActivity" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowDisablePreview">true</item>
+    </style>
+    <style name="Widget.AmbientOS.Button" parent="Widget.MaterialComponents.Button">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+    <style name="Widget.AmbientOS.EditText" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/primary</item>
+        <item name="hintTextColor">@color/text_secondary</item>
+    </style>
+    <style name="Widget.AmbientOS.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.AmbientOS.Switch</item>
     </style>
 </resources>

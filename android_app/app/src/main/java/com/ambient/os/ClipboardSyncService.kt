@@ -1,119 +1,190 @@
 package com.ambient.os
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import kotlinx.coroutines.*
-import okhttp3.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.IOException
+import org.json.JSONObject
+import java.util.concurrent.TimeUnit
 
 class ClipboardSyncService : Service() {
-
-    private val client = OkHttpClient()
-    private lateinit var job: Job
-    private var lastClipboardContent: String? = null
-
-    companion object {
-        const val NOTIFICATION_CHANNEL_ID = "ClipboardSyncChannel"
-    }
-
-    override fun onBind(intent: Intent?): IBinder? = null
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val ipAddress = intent?.getStringExtra("IP_ADDRESS") ?: return START_NOT_STICKY
-        
+    private lateinit var clipboardManager: ClipboardManager
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .writeTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(10, TimeUnit.SECONDS)
+        .build()
+    
+    private var syncJob: Job? = null
+    private var lastSyncedText: String? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private val syncInterval = 2000L // 2 seconds
+    
+    override fun onCreate() {
+        super.onCreate()
+        clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         createNotificationChannel()
-        val notification = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setContentTitle("Ambient OS")
-            .setContentText("Clipboard sync is active.")
-            .setSmallIcon(android.R.drawable.sym_def_app_icon)
-            .build()
-
-        startForeground(1, notification)
-
-        val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        lastClipboardContent = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
-
-        job = CoroutineScope(Dispatchers.IO).launch {
-            while (isActive) {
-                // Sync from server to local
-                syncFromServer(ipAddress, clipboardManager)
-
-                // Sync from local to server
-                syncToServer(ipAddress, clipboardManager)
-
-                delay(2000) // Poll every 2 seconds
-            }
-        }
+        startForeground(NOTIFICATION_ID, createNotification())
+    }
+    
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        startClipboardSync()
         return START_STICKY
     }
-
+    
+    override fun onBind(intent: Intent?): IBinder? = null
+    
     override fun onDestroy() {
-        job.cancel()
+        stopClipboardSync()
         super.onDestroy()
     }
-
+    
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val serviceChannel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                "Clipboard Sync Service Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(serviceChannel)
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Clipboard Sync",
+                NotificationManager.IMPORTANCE_LOW
+            ).apply {
+                description = "Keeps your clipboard in sync with your computer"
+                setShowBadge(false)
+            }
+            
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
         }
     }
-
-    private fun syncFromServer(ipAddress: String, clipboardManager: ClipboardManager) {
-        val request = Request.Builder().url("http://$ipAddress:3000/clipboard").build()
+    
+    private fun createNotification(): Notification {
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            Intent(this, MainActivity::class.java),
+            PendingIntent.FLAG_IMMUTABLE
+        )
+        
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Ambient OS")
+            .setContentText("Clipboard sync is active")
+            .setSmallIcon(R.drawable.ic_clipboard)
+            .setColor(resources.getColor(R.color.primary, theme))
+            .setColorized(true)
+            .setOngoing(true)
+            .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .build()
+    }
+    
+    private fun startClipboardSync() {
+        if (syncJob != null) return
+        
+        syncJob = CoroutineScope(Dispatchers.IO).launch {
+            while (isActive) {
+                checkClipboard()
+                checkServerClipboard()
+                delay(syncInterval)
+            }
+        }
+    }
+    
+    private fun stopClipboardSync() {
+        syncJob?.cancel()
+        syncJob = null
+    }
+    
+    private fun checkClipboard() {
+        if (!clipboardManager.hasPrimaryClip()) return
+        
+        val clipData = clipboardManager.primaryClip ?: return
+        if (clipData.itemCount <= 0) return
+        
+        val text = clipData.getItemAt(0).text?.toString() ?: return
+        if (text == lastSyncedText) return
+        
+        val ipAddress = getSharedPreferences("ambient_prefs", Context.MODE_PRIVATE)
+            .getFormattedIpAddress()
+        if (ipAddress.isEmpty()) return
+        
         try {
+            val json = JSONObject().put("content", text).toString()
+            val body = json.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
+            val request = Request.Builder()
+                .url("http://$ipAddress/clipboard")
+                .post(body)
+                .build()
+            
             client.newCall(request).execute().use { response ->
                 if (response.isSuccessful) {
-                    val responseBody = response.body?.string()
-                    // Simple JSON parsing
-                    val serverContent = responseBody?.substringAfter("\"content\":\"")?.substringBeforeLast("\"")
+                    lastSyncedText = text
+                    Log.d(TAG, "Clipboard synced to server")
+                } else {
+                    Log.e(TAG, "Failed to sync clipboard: ${response.message}")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error syncing clipboard", e)
+        }
+    }
+    
+    private fun checkServerClipboard() {
+        val ipAddress = getSharedPreferences("ambient_prefs", Context.MODE_PRIVATE)
+            .getFormattedIpAddress()
+        if (ipAddress.isEmpty()) return
+        
+        try {
+            val request = Request.Builder()
+                .url("http://$ipAddress/clipboard")
+                .get()
+                .build()
+            
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val responseBody = response.body?.string() ?: return
+                    val jsonObject = JSONObject(responseBody)
+                    val content = jsonObject.optString("content", "")
                     
-                    if (serverContent != null && serverContent != lastClipboardContent) {
-                        val clip = android.content.ClipData.newPlainText("synced-clipboard", serverContent)
-                        clipboardManager.setPrimaryClip(clip)
-                        lastClipboardContent = serverContent
-                        Log.d("ClipboardSync", "Synced from server: $serverContent")
+                    if (content.isNotEmpty() && content != lastSyncedText) {
+                        handler.post {
+                            updateClipboard(content)
+                        }
+                        lastSyncedText = content
+                        Log.d(TAG, "Clipboard updated from server")
                     }
                 }
             }
-        } catch (e: IOException) {
-            Log.e("ClipboardSync", "Failed to sync from server", e)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error checking server clipboard", e)
         }
     }
-
-    private fun syncToServer(ipAddress: String, clipboardManager: ClipboardManager) {
-        val currentClip = clipboardManager.primaryClip?.getItemAt(0)?.text?.toString()
-        if (currentClip != null && currentClip != lastClipboardContent) {
-            lastClipboardContent = currentClip
-            val json = "{\"content\":\"$currentClip\"}"
-            val body = json.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
-            val request = Request.Builder().url("http://$ipAddress:3000/clipboard").post(body).build()
-
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Log.e("ClipboardSync", "Failed to sync to server", e)
-                }
-                override fun onResponse(call: Call, response: Response) {
-                    if(response.isSuccessful) {
-                        Log.d("ClipboardSync", "Synced to server: $currentClip")
-                    }
-                }
-            })
-        }
+    
+    private fun updateClipboard(text: String) {
+        val clipData = android.content.ClipData.newPlainText("Ambient OS Clipboard", text)
+        clipboardManager.setPrimaryClip(clipData)
+    }
+    
+    companion object {
+        private const val CHANNEL_ID = "clipboard_sync_channel"
+        private const val NOTIFICATION_ID = 1001
+        private const val TAG = "ClipboardSyncService"
     }
 }
