@@ -1,3 +1,49 @@
 <resources>
     <string name="app_name">Ambient OS</string>
+
+    <!-- Main Screen -->
+    <string name="app_subtitle">Seamless Device Connectivity</string>
+    <string name="app_description">Share clipboard, images, and files across all your devices effortlessly</string>
+
+    <!-- Server Connection -->
+    <string name="server_connection_title">Server Connection</string>
+    <string name="server_connection_description">Connect to your Ambient server to sync across devices</string>
+    <string name="server_ip_hint">192.168.1.100:23921</string>
+    <string name="save_server_address">Save Server Address</string>
+    <string name="connection_status">Connection Status</string>
+    <string name="status_connected">Connected</string>
+    <string name="status_disconnected">Disconnected</string>
+    <string name="status_connecting">Connecting…</string>
+
+    <!-- Clipboard Sync -->
+    <string name="clipboard_sync_title">Clipboard Sync</string>
+    <string name="clipboard_sync_description">Automatically sync clipboard content between your devices</string>
+    <string name="enable_clipboard_sync">Enable Clipboard Sync</string>
+    <string name="sync_active">Sync Active</string>
+    <string name="sync_inactive">Sync Inactive</string>
+
+    <!-- Image Sharing -->
+    <string name="image_sharing_title">Image Sharing</string>
+    <string name="image_sharing_description">Quickly share images between your devices</string>
+    <string name="select_image">Select Image</string>
+    <string name="upload_image">Upload Image</string>
+    <string name="uploading">Uploading…</string>
+    <string name="no_image_selected">No image selected</string>
+    <string name="tap_to_select_image">Tap \"Select Image\" to choose a photo</string>
+
+    <!-- Quick Access -->
+    <string name="quick_access_title">Quick Access</string>
+    <string name="quick_access_share_menu">Use \'Ambient OS\' in the share menu for instant sharing</string>
+    <string name="quick_access_tile">Add the \'Share to PC\' quick settings tile for one-tap sharing</string>
+    <string name="quick_access_clipboard">Clipboard sync works automatically in the background</string>
+
+    <!-- Messages -->
+    <string name="server_address_saved">Server address saved successfully</string>
+    <string name="enter_valid_ip">Please enter a valid server address</string>
+    <string name="upload_successful">Upload successful!</string>
+    <string name="upload_failed">Upload failed: %s</string>
+    <string name="select_image_first">Please select an image first</string>
+    <string name="set_server_ip_first">Please set server address first</string>
+    <string name="notification_permission_required">Notification permission is required for clipboard sync</string>
+    <string name="error_occurred">Error: %s</string>
 </resources> 

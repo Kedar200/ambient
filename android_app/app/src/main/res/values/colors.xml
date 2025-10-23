@@ -8,16 +8,47 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     
-    <!-- Custom color scheme -->
-    <color name="primary">#0D9488</color>
-    <color name="primary_dark">#0F766E</color>
-    <color name="primary_light">#5EEAD4</color>
-    <color name="accent">#F97316</color>
-    <color name="background">#F0F9FF</color>
+    <!-- Material Design 3 Color Scheme - Modern Teal/Cyan Theme -->
+    <color name="primary">#0891B2</color>
+    <color name="primary_dark">#0E7490</color>
+    <color name="primary_light">#06B6D4</color>
+    <color name="primary_container">#CFFAFE</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="on_primary_container">#164E63</color>
+
+    <color name="secondary">#0EA5E9</color>
+    <color name="secondary_dark">#0284C7</color>
+    <color name="secondary_container">#E0F2FE</color>
+    <color name="on_secondary">#FFFFFF</color>
+    <color name="on_secondary_container">#0C4A6E</color>
+
+    <color name="accent">#F59E0B</color>
+    <color name="accent_light">#FCD34D</color>
+
+    <color name="background">#F8FAFC</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F1F5F9</color>
     <color name="card_background">#FFFFFF</color>
-    <color name="text_primary">#0C4A6E</color>
-    <color name="text_secondary">#38BDF8</color>
-    <color name="divider">#E0F2FE</color>
-    <color name="success">#22C55E</color>
+
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="text_tertiary">#94A3B8</color>
+
+    <color name="divider">#E2E8F0</color>
+    <color name="outline">#CBD5E1</color>
+
+    <color name="success">#10B981</color>
+    <color name="success_container">#D1FAE5</color>
     <color name="error">#EF4444</color>
+    <color name="error_container">#FEE2E2</color>
+    <color name="warning">#F59E0B</color>
+    <color name="info">#3B82F6</color>
+
+    <!-- State colors -->
+    <color name="state_enabled">#10B981</color>
+    <color name="state_disabled">#94A3B8</color>
+
+    <!-- Shadows and overlays -->
+    <color name="shadow">#1A000000</color>
+    <color name="scrim">#80000000</color>
 </resources> 

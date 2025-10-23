@@ -45,6 +45,8 @@ class MainActivity : AppCompatActivity() {
             result.data?.data?.let { uri ->
                 selectedImageUri = uri
                 binding.previewImageView.setImageURI(uri)
+                binding.previewImageView.visibility = android.view.View.VISIBLE
+                binding.emptyStateLayout.visibility = android.view.View.GONE
             }
         }
     }
@@ -62,10 +64,14 @@ class MainActivity : AppCompatActivity() {
         // Load saved IP address
         val savedIp = sharedPreferences.getString("ip_address", "")
         binding.ipAddressInput.setText(savedIp)
-        
+
+        // Update connection status based on saved IP
+        updateConnectionStatus(!savedIp.isNullOrEmpty())
+
         // Setup clipboard sync switch
         val isSyncEnabled = sharedPreferences.getBoolean("clipboard_sync_enabled", false)
         binding.syncSwitch.isChecked = isSyncEnabled
+        updateSyncStatus(isSyncEnabled)
         
         // Setup UI interactions
         setupClickListeners()
@@ -79,9 +85,10 @@ class MainActivity : AppCompatActivity() {
             val ipAddress = binding.ipAddressInput.text.toString().trim()
             if (ipAddress.isNotEmpty()) {
                 sharedPreferences.edit().putString("ip_address", ipAddress).apply()
-                Toast.makeText(this, "Server address saved", Toast.LENGTH_SHORT).show()
+                updateConnectionStatus(true)
+                Toast.makeText(this, R.string.server_address_saved, Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "Please enter a valid IP address", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, R.string.enter_valid_ip, Toast.LENGTH_SHORT).show()
             }
         }
         
@@ -93,12 +100,13 @@ class MainActivity : AppCompatActivity() {
         binding.uploadButton.setOnClickListener {
             selectedImageUri?.let { uri ->
                 uploadImage(uri)
-            } ?: Toast.makeText(this, "Please select an image first", Toast.LENGTH_SHORT).show()
+            } ?: Toast.makeText(this, R.string.select_image_first, Toast.LENGTH_SHORT).show()
         }
         
         binding.syncSwitch.setOnCheckedChangeListener { _, isChecked ->
             sharedPreferences.edit().putBoolean("clipboard_sync_enabled", isChecked).apply()
-            
+            updateSyncStatus(isChecked)
+
             if (isChecked) {
                 startClipboardService()
             } else {
@@ -141,13 +149,13 @@ class MainActivity : AppCompatActivity() {
     private fun uploadImage(uri: Uri) {
         val ipAddress = sharedPreferences.getFormattedIpAddress()
         if (ipAddress.isEmpty()) {
-            Toast.makeText(this, "Please set server IP address first", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.set_server_ip_first, Toast.LENGTH_SHORT).show()
             return
         }
 
         // Show loading state
         binding.uploadButton.isEnabled = false
-        binding.uploadButton.text = "Uploading..."
+        binding.uploadButton.text = getString(R.string.uploading)
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -169,25 +177,47 @@ class MainActivity : AppCompatActivity() {
                 client.newCall(request).execute().use { response ->
                     withContext(Dispatchers.Main) {
                         if (response.isSuccessful) {
-                            Toast.makeText(this@MainActivity, "Upload successful!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@MainActivity, R.string.upload_successful, Toast.LENGTH_SHORT).show()
                         } else {
-                            Toast.makeText(this@MainActivity, "Upload failed: ${response.message}", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@MainActivity, getString(R.string.upload_failed, response.message), Toast.LENGTH_SHORT).show()
                         }
                         // Reset button state
                         binding.uploadButton.isEnabled = true
-                        binding.uploadButton.text = "Upload"
+                        binding.uploadButton.text = getString(R.string.upload_image)
                     }
                 }
 
                 file.delete() // Clean up temp file
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, getString(R.string.error_occurred, e.message), Toast.LENGTH_SHORT).show()
                     // Reset button state
                     binding.uploadButton.isEnabled = true
-                    binding.uploadButton.text = "Upload"
+                    binding.uploadButton.text = getString(R.string.upload_image)
                 }
             }
+        }
+    }
+
+    private fun updateConnectionStatus(isConnected: Boolean) {
+        if (isConnected) {
+            binding.connectionStatusChip.text = getString(R.string.status_connected)
+            binding.connectionStatusChip.setChipBackgroundColorResource(R.color.success_container)
+            binding.connectionStatusChip.setTextColor(getColor(R.color.success))
+        } else {
+            binding.connectionStatusChip.text = getString(R.string.status_disconnected)
+            binding.connectionStatusChip.setChipBackgroundColorResource(R.color.surface_variant)
+            binding.connectionStatusChip.setTextColor(getColor(R.color.text_secondary))
+        }
+    }
+
+    private fun updateSyncStatus(isEnabled: Boolean) {
+        if (isEnabled) {
+            binding.syncStatusText.text = getString(R.string.sync_active)
+            binding.syncStatusText.setTextColor(getColor(R.color.success))
+        } else {
+            binding.syncStatusText.text = getString(R.string.sync_inactive)
+            binding.syncStatusText.setTextColor(getColor(R.color.text_tertiary))
         }
     }
 
@@ -230,8 +260,9 @@ class MainActivity : AppCompatActivity() {
                     startClipboardService()
                 }
             } else {
-                Toast.makeText(this, "Notification permission is required for clipboard sync", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, R.string.notification_permission_required, Toast.LENGTH_LONG).show()
                 binding.syncSwitch.isChecked = false
+                updateSyncStatus(false)
             }
         }
     }
