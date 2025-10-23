@@ -1,4 +1,0 @@
-#Sun Jun 22 02:57:30 IST 2025
-base.0=/Users/kedar/personal/ambient/android_app/app/build/intermediates/dex/release/mergeDexRelease/classes.dex
-path.0=classes.dex
-renamed.0=classes.dex
