@@ -99,23 +99,83 @@ async fn upload(mut multipart: Multipart) -> Result<Html<String>, AppError> {
 
             info!(file_name, "Length of `{}` is {} bytes", file_name, data.len());
 
+            // Create uploads directory if it doesn't exist
+            tokio::fs::create_dir_all("uploads").await?;
+
             let path = format!("uploads/{}", file_name);
+            let absolute_path = std::fs::canonicalize(".").unwrap().join(&path);
             let mut file = File::create(&path).await?;
             file.write_all(&data).await?;
 
-            // Open the file with the default application
-            if let Err(e) = open::that(&path) {
-                return Err(AppError(
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    format!("Failed to open file: {}", e),
-                ));
-            }
+            // Show macOS notification with the image
+            show_image_notification(&absolute_path.to_string_lossy(), &file_name).await;
 
-            return Ok(Html(format!("File `{}` uploaded and opened successfully.", file_name)));
+            return Ok(Html(format!("File `{}` uploaded successfully.", file_name)));
         }
     }
 
     Ok(Html("No file uploaded.".to_string()))
+}
+
+async fn show_image_notification(image_path: &str, file_name: &str) {
+    // Use our custom PhotoToast app for beautiful floating notifications
+    let toast_app = "/Users/kedar/personal/ambient/mac_toast/PhotoToast";
+    
+    let result = tokio::process::Command::new(toast_app)
+        .args([image_path, file_name])
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn();
+
+    match result {
+        Ok(mut child) => {
+            info!("Toast notification process spawned for {}", file_name);
+            let stdout = child.stdout.take();
+            let stderr = child.stderr.take();
+
+            // In separate tasks, read and log outputs
+            if let Some(stdout) = stdout {
+                tokio::spawn(async move {
+                    let mut reader = tokio::io::BufReader::new(stdout);
+                    let mut line = String::new();
+                    while let Ok(n) = tokio::io::AsyncBufReadExt::read_line(&mut reader, &mut line).await {
+                        if n == 0 { break; }
+                        info!("PhotoToast stdout: {}", line.trim());
+                        line.clear();
+                    }
+                });
+            }
+
+            if let Some(stderr) = stderr {
+                tokio::spawn(async move {
+                    let mut reader = tokio::io::BufReader::new(stderr);
+                    let mut line = String::new();
+                    while let Ok(n) = tokio::io::AsyncBufReadExt::read_line(&mut reader, &mut line).await {
+                        if n == 0 { break; }
+                        warn!("PhotoToast stderr: {}", line.trim());
+                        line.clear();
+                    }
+                });
+            }
+
+            tokio::spawn(async move {
+                let status = child.wait().await;
+                info!("PhotoToast process exited with status: {:?}", status);
+            });
+        }
+        Err(e) => {
+            warn!("Failed to spawn toast process: {:?}, falling back to system notification", e);
+            // Fallback to osascript notification
+            let script = format!(
+                r#"display notification "Received: {}" with title "📸 Live Photo Wall" sound name "default""#,
+                file_name
+            );
+            let _ = tokio::process::Command::new("osascript")
+                .args(["-e", &script])
+                .output()
+                .await;
+        }
+    }
 }
 
 #[instrument(skip(state))]

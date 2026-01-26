@@ -53,4 +53,11 @@
     <string name="device_found">Found: %s</string>
     <string name="no_device_found">No devices found on network</string>
     <string name="discovery_error">Discovery error: %s</string>
+
+    <!-- Live Photo Wall -->
+    <string name="live_photo_wall_title">Live Photo Wall</string>
+    <string name="live_photo_wall_description">New photos automatically appear on your Mac</string>
+    <string name="enable_live_photo_wall">Enable Live Photo Wall</string>
+    <string name="photo_wall_active">Watching for photos</string>
+    <string name="photo_wall_inactive">Disabled</string>
 </resources> 

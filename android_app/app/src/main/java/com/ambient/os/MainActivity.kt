@@ -55,9 +55,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
-        // Setup toolbar
-        setSupportActionBar(binding.toolbar)
 
         sharedPreferences = getSharedPreferences("ambient_prefs", Context.MODE_PRIVATE)
         
@@ -72,6 +69,11 @@ class MainActivity : AppCompatActivity() {
         val isSyncEnabled = sharedPreferences.getBoolean("clipboard_sync_enabled", false)
         binding.syncSwitch.isChecked = isSyncEnabled
         updateSyncStatus(isSyncEnabled)
+        
+        // Setup photo wall switch
+        val isPhotoWallEnabled = sharedPreferences.getBoolean("photo_wall_enabled", false)
+        binding.photoWallSwitch.isChecked = isPhotoWallEnabled
+        updatePhotoWallStatus(isPhotoWallEnabled)
         
         // Setup UI interactions
         setupClickListeners()
@@ -115,6 +117,31 @@ class MainActivity : AppCompatActivity() {
                 startClipboardService()
             } else {
                 stopClipboardService()
+            }
+        }
+        
+        binding.photoWallSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                // Check for READ_MEDIA_IMAGES permission on Android 13+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
+                        != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(
+                            this,
+                            arrayOf(Manifest.permission.READ_MEDIA_IMAGES),
+                            MEDIA_PERMISSION_CODE
+                        )
+                        // Will start service in onRequestPermissionsResult
+                        return@setOnCheckedChangeListener
+                    }
+                }
+                sharedPreferences.edit().putBoolean("photo_wall_enabled", true).apply()
+                updatePhotoWallStatus(true)
+                startPhotoWatcherService()
+            } else {
+                sharedPreferences.edit().putBoolean("photo_wall_enabled", false).apply()
+                updatePhotoWallStatus(false)
+                stopPhotoWatcherService()
             }
         }
     }
@@ -204,6 +231,30 @@ class MainActivity : AppCompatActivity() {
     private fun stopClipboardService() {
         val serviceIntent = Intent(this, ClipboardSyncService::class.java)
         stopService(serviceIntent)
+    }
+    
+    private fun startPhotoWatcherService() {
+        val serviceIntent = Intent(this, PhotoWatcherService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent)
+        } else {
+            startService(serviceIntent)
+        }
+    }
+    
+    private fun stopPhotoWatcherService() {
+        val serviceIntent = Intent(this, PhotoWatcherService::class.java)
+        stopService(serviceIntent)
+    }
+    
+    private fun updatePhotoWallStatus(isEnabled: Boolean) {
+        if (isEnabled) {
+            binding.photoWallStatusText.text = getString(R.string.photo_wall_active)
+            binding.photoWallStatusText.setTextColor(getColor(R.color.success))
+        } else {
+            binding.photoWallStatusText.text = getString(R.string.photo_wall_inactive)
+            binding.photoWallStatusText.setTextColor(getColor(R.color.text_tertiary))
+        }
     }
     
     private fun checkClipboardPermissions() {
@@ -341,10 +392,21 @@ class MainActivity : AppCompatActivity() {
                 binding.syncSwitch.isChecked = false
                 updateSyncStatus(false)
             }
+        } else if (requestCode == MEDIA_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                sharedPreferences.edit().putBoolean("photo_wall_enabled", true).apply()
+                updatePhotoWallStatus(true)
+                startPhotoWatcherService()
+            } else {
+                Toast.makeText(this, "Photo access required for Live Photo Wall", Toast.LENGTH_LONG).show()
+                binding.photoWallSwitch.isChecked = false
+                updatePhotoWallStatus(false)
+            }
         }
     }
 
     companion object {
         private const val NOTIFICATION_PERMISSION_CODE = 101
+        private const val MEDIA_PERMISSION_CODE = 102
     }
 } 
