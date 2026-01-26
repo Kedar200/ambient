@@ -92,6 +92,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
         
+        binding.autoDiscoverButton.setOnClickListener {
+            startDeviceDiscovery()
+        }
+        
         binding.selectImageButton.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
             pickImage.launch(intent)
@@ -113,6 +117,79 @@ class MainActivity : AppCompatActivity() {
                 stopClipboardService()
             }
         }
+    }
+    
+    private var discoveryManager: DeviceDiscoveryManager? = null
+    
+    private fun startDeviceDiscovery() {
+        // Update button to show scanning state
+        binding.autoDiscoverButton.isEnabled = false
+        binding.autoDiscoverButton.text = getString(R.string.scanning)
+        
+        if (discoveryManager == null) {
+            discoveryManager = DeviceDiscoveryManager(this)
+        }
+        
+        discoveryManager?.startDiscovery(object : DeviceDiscoveryManager.DiscoveryCallback {
+            override fun onDeviceFound(hostAddress: String, port: Int, deviceName: String) {
+                runOnUiThread {
+                    // Auto-fill the IP address
+                    val address = "$hostAddress:$port"
+                    binding.ipAddressInput.setText(address)
+                    
+                    // Save it automatically
+                    sharedPreferences.edit().putString("ip_address", address).apply()
+                    updateConnectionStatus(true)
+                    
+                    Toast.makeText(
+                        this@MainActivity, 
+                        getString(R.string.device_found, deviceName), 
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    
+                    // Stop discovery after finding a device
+                    discoveryManager?.stopDiscovery()
+                    resetDiscoveryButton()
+                }
+            }
+            
+            override fun onDiscoveryStarted() {
+                // Already showing scanning state
+            }
+            
+            override fun onDiscoveryStopped() {
+                runOnUiThread {
+                    resetDiscoveryButton()
+                }
+            }
+            
+            override fun onError(message: String) {
+                runOnUiThread {
+                    Toast.makeText(
+                        this@MainActivity, 
+                        getString(R.string.discovery_error, message), 
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    resetDiscoveryButton()
+                }
+            }
+        })
+        
+        // Stop discovery after 10 seconds if no device found
+        android.os.Handler(mainLooper).postDelayed({
+            if (discoveryManager?.isDiscovering() == true) {
+                discoveryManager?.stopDiscovery()
+                runOnUiThread {
+                    Toast.makeText(this, R.string.no_device_found, Toast.LENGTH_SHORT).show()
+                    resetDiscoveryButton()
+                }
+            }
+        }, 10000)
+    }
+    
+    private fun resetDiscoveryButton() {
+        binding.autoDiscoverButton.isEnabled = true
+        binding.autoDiscoverButton.text = getString(R.string.auto_discover)
     }
     
     private fun startClipboardService() {

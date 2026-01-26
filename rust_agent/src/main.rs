@@ -5,12 +5,13 @@ use axum::{
     routing::{get, post},
     Router,
 };
+use mdns_sd::{ServiceDaemon, ServiceInfo};
 use serde::{Deserialize, Serialize};
 use std::io;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::{fs::File, io::AsyncWriteExt, sync::Mutex};
-use tracing::{info, instrument};
+use tracing::{info, instrument, warn};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use open;
 use arboard::Clipboard;
@@ -34,6 +35,30 @@ async fn main() {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
+    // Start mDNS service advertisement
+    let mdns = ServiceDaemon::new().expect("Failed to create mDNS daemon");
+    let service_type = "_ambient._tcp.local.";
+    let instance_name = hostname::get()
+        .map(|h| h.to_string_lossy().to_string())
+        .unwrap_or_else(|_| "AmbientOS".to_string());
+    let port = 23921u16;
+
+    let service_info = ServiceInfo::new(
+        service_type,
+        &instance_name,
+        &format!("{}.local.", instance_name),
+        "",
+        port,
+        None,
+    )
+    .expect("Failed to create service info")
+    .enable_addr_auto();
+
+    match mdns.register(service_info) {
+        Ok(_) => info!("mDNS service registered as '{}' on port {}", instance_name, port),
+        Err(e) => warn!("Failed to register mDNS service: {:?}", e),
+    }
+
     let state = Arc::new(AppState {
         clipboard: Mutex::new(Clipboard::new().expect("Failed to initialize clipboard")),
     });
@@ -45,13 +70,17 @@ async fn main() {
         .layer(DefaultBodyLimit::max(50 * 1024 * 1024))
         .with_state(state);
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 23921));
+    let addr = SocketAddr::from(([0, 0, 0, 0], port));
     info!("listening on {}", addr);
     let listener = tokio::net::TcpListener::bind(addr).await.unwrap();
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await
         .unwrap();
+
+    // Graceful shutdown: unregister mDNS service
+    info!("Shutting down mDNS service...");
+    let _ = mdns.shutdown();
 }
 
 // basic handler that responds with a static string

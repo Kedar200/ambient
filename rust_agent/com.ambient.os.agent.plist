@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.ambient.os.agent</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/kedar/personal/ambient/rust_agent/target/release/rust_agent</string>
+    </array>
+    
+    <key>WorkingDirectory</key>
+    <string>/Users/kedar/personal/ambient/rust_agent</string>
+    
+    <key>RunAtLoad</key>
+    <true/>
+    
+    <key>KeepAlive</key>
+    <true/>
+    
+    <key>StandardOutPath</key>
+    <string>/Users/kedar/personal/ambient/rust_agent/ambient.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>/Users/kedar/personal/ambient/rust_agent/ambient.log</string>
+    
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>RUST_LOG</key>
+        <string>rust_agent=info</string>
+    </dict>
+</dict>
+</plist>

@@ -46,4 +46,11 @@
     <string name="set_server_ip_first">Please set server address first</string>
     <string name="notification_permission_required">Notification permission is required for clipboard sync</string>
     <string name="error_occurred">Error: %s</string>
+
+    <!-- Auto-Discovery -->
+    <string name="auto_discover">Auto-Discover</string>
+    <string name="scanning">Scanning…</string>
+    <string name="device_found">Found: %s</string>
+    <string name="no_device_found">No devices found on network</string>
+    <string name="discovery_error">Discovery error: %s</string>
 </resources> 
