@@ -51,12 +51,37 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private var proximityBeacon: ProximityBeacon? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         sharedPreferences = getSharedPreferences("ambient_prefs", Context.MODE_PRIVATE)
+        
+        // Start Proximity Beacon (BLE Advertising)
+        proximityBeacon = ProximityBeacon(this)
+        
+        // Check Bluetooth permissions for Android 12+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val permissions = arrayOf(
+                Manifest.permission.BLUETOOTH_ADVERTISE,
+                Manifest.permission.BLUETOOTH_CONNECT
+            )
+            val neededPermissions = permissions.filter {
+                ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+            }
+            
+            if (neededPermissions.isEmpty()) {
+                proximityBeacon?.startAdvertising()
+            } else {
+                ActivityCompat.requestPermissions(this, neededPermissions.toTypedArray(), BLE_PERMISSION_CODE)
+            }
+        } else {
+            // Older Android versions
+            proximityBeacon?.startAdvertising()
+        }
         
         // Load saved IP address
         val savedIp = sharedPreferences.getString("ip_address", "")
@@ -397,10 +422,14 @@ class MainActivity : AppCompatActivity() {
                 sharedPreferences.edit().putBoolean("photo_wall_enabled", true).apply()
                 updatePhotoWallStatus(true)
                 startPhotoWatcherService()
-            } else {
-                Toast.makeText(this, "Photo access required for Live Photo Wall", Toast.LENGTH_LONG).show()
                 binding.photoWallSwitch.isChecked = false
                 updatePhotoWallStatus(false)
+            }
+        } else if (requestCode == BLE_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
+                proximityBeacon?.startAdvertising()
+            } else {
+                Toast.makeText(this, "Bluetooth access required for Proximity Shield", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -408,5 +437,11 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val NOTIFICATION_PERMISSION_CODE = 101
         private const val MEDIA_PERMISSION_CODE = 102
+        private const val BLE_PERMISSION_CODE = 103
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        proximityBeacon?.stopAdvertising()
     }
 } 

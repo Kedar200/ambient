@@ -59,6 +59,17 @@ async fn main() {
         Err(e) => warn!("Failed to register mDNS service: {:?}", e),
     }
 
+    // Auto-start AmbientShield (proximity-based screen lock)
+    let shield_path = "/Users/kedar/personal/ambient/AmbientShield/AmbientShield";
+    match std::process::Command::new(shield_path)
+        .stdout(std::process::Stdio::inherit())
+        .stderr(std::process::Stdio::inherit())
+        .spawn()
+    {
+        Ok(child) => info!("🛡️ AmbientShield started (PID: {})", child.id()),
+        Err(e) => warn!("Failed to start AmbientShield: {:?}", e),
+    }
+
     let state = Arc::new(AppState {
         clipboard: Mutex::new(Clipboard::new().expect("Failed to initialize clipboard")),
     });

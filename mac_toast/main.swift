@@ -147,7 +147,7 @@ struct ToastView: View {
                         )
                 }
                 
-                // Info section
+                /* Info section removed as per request
                 HStack(spacing: 12) {
                     Text("📸")
                         .font(.system(size: 28))
@@ -169,6 +169,7 @@ struct ToastView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 14)
                 .background(Color.black.opacity(0.5))
+                */
             }
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .overlay(
