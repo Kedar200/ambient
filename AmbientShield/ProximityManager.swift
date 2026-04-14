@@ -8,6 +8,9 @@ class ProximityManager: NSObject, ObservableObject, CBCentralManagerDelegate {
         }
     }
     @Published var signalStrengthLoss: Int = 0 // 0 = perfect signal, 100 = lost
+    @Published var phoneBatteryLevel: Int = 0 // Phone battery percentage (0-100)
+    @Published var isConnected: Bool = false // True if signal received recently
+
     
     weak var window: NSWindow?
     
@@ -20,6 +23,11 @@ class ProximityManager: NSObject, ObservableObject, CBCentralManagerDelegate {
     private var shakeCount = 0
     private var lastShakeTime = Date()
     private var mouseCheckTimer: Timer?
+    
+    // Connection tracking
+    private var lastSignalTime: Date?
+    private let connectionTimeout: TimeInterval = 3.0 // Seconds before considering signal lost
+
     
     // Cooldown: prevents shield from reappearing until phone comes close again
     private var userDismissedShield = false  // True after mouse shake override
@@ -44,6 +52,19 @@ class ProximityManager: NSObject, ObservableObject, CBCentralManagerDelegate {
         // Poll mouse location every 0.1s. Works globally without Accessibility permissions for "Location only"
         mouseCheckTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
             self?.handleMouseMovement()
+            self?.checkConnectionStatus()
+        }
+    }
+    
+    func checkConnectionStatus() {
+        if let lastSignal = lastSignalTime {
+            let timeSinceLastSignal = Date().timeIntervalSince(lastSignal)
+            if timeSinceLastSignal > connectionTimeout && isConnected {
+                DispatchQueue.main.async {
+                    self.isConnected = false
+                    print("⚠️ Connection lost - no signal for \(self.connectionTimeout)s")
+                }
+            }
         }
     }
     
@@ -102,6 +123,29 @@ class ProximityManager: NSObject, ObservableObject, CBCentralManagerDelegate {
         let strength = RSSI.intValue
         // Filter out absurd values
         if strength == 127 { return } 
+        
+        // Update connection status
+        lastSignalTime = Date()
+        if !isConnected {
+            DispatchQueue.main.async {
+                self.isConnected = true
+                print("✅ specific Connection restored")
+            }
+        }
+ 
+        
+        // Parse battery level from manufacturer data
+        // Format: 2 bytes manufacturer ID (0xFFFF) + 1 byte battery level
+        if let manufacturerData = advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data,
+           manufacturerData.count >= 3 {
+            let batteryLevel = Int(manufacturerData[2])
+            if batteryLevel >= 0 && batteryLevel <= 100 {
+                DispatchQueue.main.async {
+                    self.phoneBatteryLevel = batteryLevel
+                }
+                print("🔋 Phone battery: \(batteryLevel)%")
+            }
+        }
         
         handleSignalUpdate(rssi: strength)
     }

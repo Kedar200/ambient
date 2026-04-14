@@ -43,13 +43,21 @@ async fn main() {
         .unwrap_or_else(|_| "AmbientOS".to_string());
     let port = 23921u16;
 
+    // TXT records so the Android app can render a cinematic device card
+    // (name, version, future capabilities) without an extra HTTP round-trip.
+    let txt_properties: &[(&str, &str)] = &[
+        ("name", instance_name.as_str()),
+        ("version", "1"),
+        ("caps", "clipboard,photos,orb"),
+    ];
+
     let service_info = ServiceInfo::new(
         service_type,
         &instance_name,
         &format!("{}.local.", instance_name),
         "",
         port,
-        None,
+        txt_properties,
     )
     .expect("Failed to create service info")
     .enable_addr_auto();
@@ -59,15 +67,15 @@ async fn main() {
         Err(e) => warn!("Failed to register mDNS service: {:?}", e),
     }
 
-    // Auto-start AmbientShield (proximity-based screen lock)
-    let shield_path = "/Users/kedar/personal/ambient/AmbientShield/AmbientShield";
+    // Auto-start AmbientOrb (battery orb overlay with proximity detection)
+    let shield_path = "/Users/kedar/personal/ambient/AmbientShield/AmbientOrb";
     match std::process::Command::new(shield_path)
         .stdout(std::process::Stdio::inherit())
         .stderr(std::process::Stdio::inherit())
         .spawn()
     {
-        Ok(child) => info!("🛡️ AmbientShield started (PID: {})", child.id()),
-        Err(e) => warn!("Failed to start AmbientShield: {:?}", e),
+        Ok(child) => info!("🔮 AmbientOrb started (PID: {})", child.id()),
+        Err(e) => warn!("Failed to start AmbientOrb: {:?}", e),
     }
 
     let state = Arc::new(AppState {

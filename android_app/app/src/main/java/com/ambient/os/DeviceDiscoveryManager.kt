@@ -25,6 +25,13 @@ class DeviceDiscoveryManager(private val context: Context) {
         fun onDiscoveryStarted()
         fun onDiscoveryStopped()
         fun onError(message: String)
+
+        /**
+         * Called after the raw NsdServiceInfo has been resolved. Default no-op so
+         * existing callers keep working. The controller overrides this to read
+         * TXT record attributes (name, battery, version).
+         */
+        fun onServiceResolved(info: NsdServiceInfo) {}
     }
 
     fun startDiscovery(callback: DiscoveryCallback) {
@@ -88,6 +95,10 @@ class DeviceDiscoveryManager(private val context: Context) {
 
                 Log.d(TAG, "Service resolved: $name at $host:$port")
 
+                // Notify controller with the full NsdServiceInfo first (so it
+                // can read TXT attributes like battery/version), then the
+                // simpler onDeviceFound for legacy callers.
+                callback.onServiceResolved(resolvedInfo)
                 if (host != null) {
                     callback.onDeviceFound(host, port, name)
                 }
